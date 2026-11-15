@@ -30,8 +30,9 @@ jobs:
       - name: Build & Sign APK
         run: |
           dotnet publish OpenUtauMobile.Android/OpenUtauMobile.Android.csproj \
-            -f net10.0-android \
+            -f net10.0-android36.0 \
             -c Release \
+            -r android-arm64 \
             -p:AndroidPackageFormat=apk \
             -o ./output
 
