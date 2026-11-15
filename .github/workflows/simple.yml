@@ -1,6 +1,6 @@
 name: Simple Android APK
 
-push:
+on:
   workflow_dispatch: # Lets you click "Run workflow" manually whenever you want
 
 jobs:
