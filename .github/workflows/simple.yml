@@ -33,16 +33,6 @@ jobs:
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
 
-      - name: Verify signing keystore
-        run: |
-          keytool -list \
-            -storetype PKCS12 \
-            -keystore "$GITHUB_WORKSPACE/release-key.jks" \
-            -alias "$ANDROID_KEY_ALIAS"
-        env:
-          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-
       - name: Build & Sign APK
         run: |
           dotnet publish OpenUtauMobile.Android/OpenUtauMobile.Android.csproj \
@@ -66,4 +56,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: OpenUtauMobile-APK
-          path: ./output/*-Signed.apk
+          path: ./output/*.apk
