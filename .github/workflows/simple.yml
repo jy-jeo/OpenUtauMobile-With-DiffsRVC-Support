@@ -26,33 +26,44 @@ jobs:
 
       - name: Install Android workload
         run: sudo dotnet workload install android
+
       - name: Restore signing keystore
         run: |
-         echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/release-key.jks"
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$GITHUB_WORKSPACE/release-key.jks"
         env:
-         ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+      - name: Verify signing keystore
+        run: |
+          keytool -list \
+            -storetype PKCS12 \
+            -keystore "$GITHUB_WORKSPACE/release-key.jks" \
+            -alias "$ANDROID_KEY_ALIAS"
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Build & Sign APK
         run: |
-         dotnet publish OpenUtauMobile.Android/OpenUtauMobile.Android.csproj \
-         -f net10.0-android36.0 \
-         -c Release \
-         -r android-arm64 \
-         -p:AndroidPackageFormat=apk \
-         -p:AndroidKeyStore=true \
-         -p:AndroidSigningKeyStore="$GITHUB_WORKSPACE/release-key.jks" \
-         -p:AndroidSigningStorePass="$ANDROID_KEYSTORE_PASSWORD" \
-         -p:AndroidSigningKeyAlias="$ANDROID_KEY_ALIAS" \
-         -p:AndroidSigningKeyPass="$ANDROID_KEY_PASSWORD" \
-         -o ./output
+          dotnet publish OpenUtauMobile.Android/OpenUtauMobile.Android.csproj \
+            -f net10.0-android36.0 \
+            -c Release \
+            -r android-arm64 \
+            -p:AndroidPackageFormat=apk \
+            -p:AndroidKeyStore=true \
+            -p:AndroidSigningKeyStore="$GITHUB_WORKSPACE/release-key.jks" \
+            -p:AndroidSigningStoreType=pkcs12 \
+            -p:AndroidSigningStorePass="$ANDROID_KEYSTORE_PASSWORD" \
+            -p:AndroidSigningKeyAlias="$ANDROID_KEY_ALIAS" \
+            -p:AndroidSigningKeyPass="$ANDROID_KEY_PASSWORD" \
+            -o ./output
         env:
-         ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-         ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-         ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-         
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: OpenUtauMobile-APK
           path: ./output/*-Signed.apk
-          
