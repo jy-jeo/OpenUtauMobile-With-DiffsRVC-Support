@@ -29,11 +29,12 @@ jobs:
 
       - name: Restore & Build APK
         run: |
-          dotnet restore OpenUtauMobile/OpenUtauMobile.csproj -p:TargetFramework=net8.0-android
+          dotnet restore OpenUtauMobile/OpenUtauMobile.csproj -p:CheckEolTargetFramework=false
           dotnet publish OpenUtauMobile/OpenUtauMobile.csproj \
             -f net8.0-android \
             -c Release \
             -p:AndroidPackageFormat=apk \
+            -p:CheckEolTargetFramework=false \
             -o ./output
 
       - name: Upload APK
