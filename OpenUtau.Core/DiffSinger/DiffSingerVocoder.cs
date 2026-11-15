@@ -83,7 +83,7 @@ namespace OpenUtau.Core.DiffSinger {
         // constant rather than a configurable field on purpose: lowering it
         // here is a deliberate code change, not something the voicebank author
         // can override.
-        public const int MaxMelBins = 255;
+        public const int MaxMelBins = 1000;
         public string name = "vocoder";
         public string model = "model.onnx";
         public int sample_rate = 44100;
